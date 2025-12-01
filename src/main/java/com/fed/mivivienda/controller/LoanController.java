@@ -31,6 +31,7 @@ public class LoanController {
         this.indicatorRepo = indicatorRepo;
     }
 
+    // 🔹 Crear préstamo
     @PostMapping
     public ResponseEntity<Loan> create(@RequestBody LoanRequest req){
         Operation op = operationRepo.findById(req.getOperationId()).orElseThrow();
@@ -49,12 +50,21 @@ public class LoanController {
         return ResponseEntity.ok(saved);
     }
 
+    // 🔹 Listar todos los préstamos
+    @GetMapping
+    public ResponseEntity<List<Loan>> getAllLoans() {
+        List<Loan> loans = loanRepo.findAll();
+        return ResponseEntity.ok(loans);
+    }
+
+    // 🔹 Cronograma de pagos
     @GetMapping("/{loanId}/schedule")
     public ResponseEntity<PaymentScheduleResponse> schedule(@PathVariable Long loanId){
         List<PaymentScheduleItem> items = loanService.schedule(loanId);
         return ResponseEntity.ok(new PaymentScheduleResponse(loanId, items));
     }
 
+    // 🔹 Indicadores financieros
     @GetMapping("/{loanId}/indicators")
     public ResponseEntity<?> indicators(@PathVariable Long loanId){
         FinancialIndicator ind = indicatorRepo.findAll().stream()
