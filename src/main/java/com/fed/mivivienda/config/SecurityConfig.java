@@ -41,11 +41,24 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // Endpoints públicos
                         .requestMatchers("/api/auth/**").permitAll()
+
+                        // Endpoints de préstamos: accesibles a CLIENTE y ADMIN
+                        .requestMatchers("/api/loans/**").hasAnyRole("CLIENTE", "ADMIN")
+
+                        // Indicadores financieros: solo ADMIN
+                        .requestMatchers("/api/loans/*/indicators").hasRole("ADMIN")
+
+                        // Cronograma de pagos: CLIENTE y AGENTE
+                        .requestMatchers("/api/loans/*/schedule").hasAnyRole("CLIENTE", "AGENTE")
+
+                        // Cualquier otro endpoint requiere autenticación
                         .anyRequest().authenticated()
                 )
                 .cors(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults());
+
         return http.build();
     }
 }
